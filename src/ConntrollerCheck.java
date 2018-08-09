@@ -1,6 +1,7 @@
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import lejos.remote.ev3.RemoteEV3;
 
@@ -11,15 +12,18 @@ public class ConntrollerCheck extends Thread {
 	private boolean[] lastButtons;
 	private boolean[] buttons;
 	private boolean working;
+	private ArrayList<Integer> remove;
 	private float[] axis;
 	private ControllerBoy getter;
 	private ButtonThread[] buttonsThreads;
+	private ArrayList<DriveThread> darr;
+	private int count;
 	private RemoteEV3 ev3;
-	private Drive drive;
 	
 	private ConntrollerCheck(){
+		darr = new ArrayList<DriveThread>();
+		count = 0;
 		ev3 = MainRun.init().getEv3();
-		drive = new Drive(MainRun.init().getRightMotor(),MainRun.init().getLeftMotor(), MainRun.init().getRightDir(), MainRun.init().getLeftDir());
 		getter = ControllerBoy.init();
 		name = "MainRunThread";
 		working = true;
@@ -78,9 +82,21 @@ public class ConntrollerCheck extends Thread {
 	public void checkAxis(){
 		axis = getter.getAxis();
 		if(axis != null){
+			remove = new ArrayList<Integer>();
 			try{
-				if(axis[0] != 0 || axis[3] != 0)
-					drive.arcadeDrive(axis[0], axis[3]);
+				if(axis[0] != 0 || axis[3] != 0){
+					darr.add(new DriveThread("DriveThread"+count,axis[0], axis[3]));
+					darr.get(darr.size()-1).start();
+					count ++;
+				}
+				for(int i = 0;i < darr.size(); i++){
+					if(!darr.get(i).isRunning()){
+						remove.add(i);
+					}	
+				}
+				for(int i = remove.size()-1; i>-1;i++){
+					darr.remove(remove.get(i));
+				}
 			}catch(NullPointerException x){}
 		}
 	}

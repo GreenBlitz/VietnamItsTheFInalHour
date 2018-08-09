@@ -1,30 +1,25 @@
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.motor.NXTRegulatedMotor;
+import java.rmi.RemoteException;
+
 import lejos.hardware.port.Port;
+import lejos.remote.ev3.RemoteEV3;
 import lejos.robotics.RegulatedMotor;
 
 public class Drive {
-	private Port port1;
-	private Port port2;
 	private int dir1;
 	private int dir2;
-	private RegulatedMotor motor1;
-	private RegulatedMotor motor2;
+	private static Drive instance;
 	
-	public Drive(Port p1, Port p2, int d1, int d2){
-		port1 = p1;
-		port2 = p2;
-		dir1 = d1;
-		dir2 = d2;
-		motor1 = new EV3LargeRegulatedMotor(p1);
-		motor2 = new EV3LargeRegulatedMotor(p2);
+	public static Drive init(){
+		if(instance == null){
+			instance = new Drive();
+		}
+		return instance;
 	}
 	
-	public Drive(RegulatedMotor m1, RegulatedMotor m2, int d1, int d2){
-		dir1 = d1;
-		dir2 = d2;
-		motor1 = m1;
-		motor2 = m2;
+	private Drive(){
+
+		dir1 = MainRun.init().getRightDir();
+		dir2 = MainRun.init().getLeftDir();
 	}
 	
 	public void arcadeDrive(float moveValue, float rotateValue){
@@ -52,7 +47,22 @@ public class Drive {
 				rightMotorSpeed = -Math.max(-moveValue, -rotateValue);
 			 }
 		 }
-		motor1.rotate((int)(rightMotorSpeed * 360 * dir1 / Math.abs(dir1)));
-		motor2.rotate((int)(leftMotorSpeed * 360 * dir2 / Math.abs(dir2)));
+		
+		try{
+			if(leftMotorSpeed > 0)
+				MainRun.init().getLeftMotor().forward();
+			else
+				MainRun.init().getLeftMotor().backward();
+			
+			if(rightMotorSpeed > 0)
+				MainRun.init().getRightMotor().forward();
+			else
+				MainRun.init().getRightMotor().backward();
+			
+			MainRun.init().getRightMotor().setSpeed((int)(rightMotorSpeed * 360*3 * dir1 / Math.abs(dir1)));
+			MainRun.init().getLeftMotor().setSpeed((int)(leftMotorSpeed * 360*3 * dir2 / Math.abs(dir2)));
+		}catch(RemoteException x){
+			x.printStackTrace();
+		}
 	}
 }

@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;
+import lejos.hardware.port.Port;
+import lejos.remote.ev3.RMIRegulatedMotor;
 import lejos.remote.ev3.RemoteEV3;
 import lejos.robotics.RegulatedMotor;
 
@@ -13,8 +15,10 @@ public class MainRun {
 	private static MainRun instance;
 	private int dirRight;
 	private int dirLeft;
-	private RegulatedMotor rightMotor;
-	private RegulatedMotor leftMotor;
+	private RMIRegulatedMotor rightMotor;
+	private RMIRegulatedMotor leftMotor;
+	private String portRight;
+	private String portLeft;
 	
 	public static void main(String[] args) {
 		MainRun.init();
@@ -30,6 +34,10 @@ public class MainRun {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		portRight = "B";
+		portLeft = "A";
+		rightMotor = ev3.createRegulatedMotor(portRight, 'M');
+		leftMotor = ev3.createRegulatedMotor(portLeft, 'M');
 		dirRight = -1; // TODO direction of the motor
 		dirLeft = -1; //TODO direction of the motor
 	}
@@ -41,18 +49,12 @@ public class MainRun {
 		return instance;
 	}
 	
-	public RegulatedMotor getRightMotor(){
-		if(rightMotor == null){
-			rightMotor = new EV3LargeRegulatedMotor(MotorPort.B);
-		}
+	public RMIRegulatedMotor getRightMotor(){
 		return rightMotor;
 		
 	}
 	
-	public RegulatedMotor getLeftMotor(){
-		if(leftMotor == null){
-			leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
-		}
+	public RMIRegulatedMotor getLeftMotor(){
 		return leftMotor;
 		
 	}
@@ -67,4 +69,5 @@ public class MainRun {
 	public int getLeftDir(){
 		return dirLeft;
 	}
+	
 }

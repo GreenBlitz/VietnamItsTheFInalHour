@@ -18,7 +18,7 @@ public class Autonomous extends Thread{
 	
 	@Override
 	public void run(){
-		//RemoteEV3 ev3 = ConntrollerCheck.init().getEv3();
+		//RemoteEV3 ev3 = MainRun.init().getEv3();
 		//here write your autonomous code
 
 	}

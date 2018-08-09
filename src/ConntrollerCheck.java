@@ -15,9 +15,11 @@ public class ConntrollerCheck extends Thread {
 	private ControllerBoy getter;
 	private ButtonThread[] buttonsThreads;
 	private RemoteEV3 ev3;
+	private Drive drive;
 	
 	private ConntrollerCheck(){
 		ev3 = MainRun.init().getEv3();
+		drive = new Drive(MainRun.init().getRightMotor(),MainRun.init().getLeftMotor(), MainRun.init().getRightDir(), MainRun.init().getLeftDir());
 		getter = ControllerBoy.init();
 		name = "MainRunThread";
 		working = true;
@@ -74,7 +76,13 @@ public class ConntrollerCheck extends Thread {
 	}
 	
 	public void checkAxis(){
-		
+		axis = getter.getAxis();
+		if(axis != null){
+			try{
+				if(axis[0] != 0 || axis[3] != 0)
+					drive.arcadeDrive(axis[0], axis[3]);
+			}catch(NullPointerException x){}
+		}
 	}
 	
 	public void start(){
